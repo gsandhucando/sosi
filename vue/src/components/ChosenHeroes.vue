@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="selectionContainer">
-      <select v-model="chosenHero"
-      :disabled="chosenHeroes.length === 3"
-      >
+      <select v-model="chosenHero" :disabled="chosenHeroes.length === 3">
         <!-- placeholder value -->
         <option :value="null">Select a hero</option>
 
@@ -25,7 +23,13 @@
         >
           Add Hero
         </button>
-        <button @click="launch" class="launchBtn" v-if="chosenHeroes.length === 3">Launch Mission</button>
+        <button
+          @click="launch"
+          class="launchBtn"
+          v-if="chosenHeroes.length === 3"
+        >
+          Launch Mission
+        </button>
       </div>
     </div>
     <br />
@@ -51,12 +55,12 @@ export default {
     return {
       chosenHero: null,
       chosenHeroes: [],
-      launchedMission: false
+      launchedMission: false,
     };
   },
   methods: {
     addHero(name) {
-      console.log(name, 'addHero')
+      console.log(name, "addHero");
       this.$emit("update:heroAdded", name);
 
       this.chosenHeroes.push({ name });
@@ -68,9 +72,9 @@ export default {
       this.$emit("update:heroRemoved", hero);
     },
     launch() {
-      this.launchedMission = true
-    alert( 'Launch Mission')
-  }
+      this.launchedMission = true;
+      alert("Launch Mission");
+    },
   },
 };
 </script>
