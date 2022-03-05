@@ -5,24 +5,29 @@
 
     <ul class="roster">
       <h3>Roster:</h3>
-      <li v-for="hero in heroes" :key="hero.name">
+      <li v-for="hero in heroes" :key="hero.id">
         <!-- to do: conditionally display this span -->
-        <div v-for="selectedHero in chosenHeroesSelected" :key="selectedHero">
-          <span v-if="selectedHero === hero.name">✔ &nbsp;</span>
+        <div
+          v-for="selectedHero in chosenHeroesSelected"
+          :key="selectedHero.id"
+        >
+          <span v-if="selectedHero.name === hero.name">✔ &nbsp;</span>
         </div>
 
         <span>{{ hero.name }}&nbsp;</span>
         <span class="edit" @click="editHero(hero)">edit</span>
       </li>
       <br />
+      <!-- <div v-for="hero in heroes" :key="hero.name"> -->
       <input
         type="text"
         placeholder="new name"
         v-model="newName"
         v-if="isEdit"
-        @keyup.enter="changeName"
+        @keyup.enter="changeName(heroToModify)"
         @blur="clear"
       />
+      <!-- </div> -->
       <br />
       <span v-if="isEdit"
         >enter to submit, click outside the box to cancel</span
@@ -31,6 +36,8 @@
     <ChosenHeroes
       :heroes="heroes"
       :chosenHeroesSelected="chosenHeroesSelected"
+      :heroToModify="heroToModify"
+      :newName="newName"
       @update:heroAdded="heroUpdated"
       @update:heroRemoved="heroRemovedFromSelected"
     />
@@ -38,6 +45,7 @@
 </template>
 
 <script>
+import { v4 as uuidv4 } from "uuid";
 import ChosenHeroes from "./components/ChosenHeroes.vue";
 
 export default {
@@ -59,29 +67,58 @@ export default {
       isEdit: false,
       heroToModify: null,
       chosenHeroesSelected: [],
+      trackModifiedHero: null,
     };
   },
+  created() {
+    this.heroes.map((hero) => {
+      return (hero.id = uuidv4());
+    });
+    console.log(this.heroes, "generating uuids for data");
+  },
+
   methods: {
     editHero(hero) {
       this.isEdit = true;
       this.newName = hero.name;
       this.heroToModify = hero;
+      console.log(hero, "edit hero function");
     },
 
-    changeName() {
-      this.heroToModify.name = this.newName;
-      this.isEdit = false;
+    changeName(hero) {
+      this.trackModifiedHero = hero;
+      if (
+        hero.name.toLowerCase().localeCompare(this.newName.toLowerCase()) === 0
+      ) {
+        return alert("name already exists");
+      }
+      if (
+        hero.name.toLowerCase().localeCompare(this.newName.toLowerCase()) ===
+          -1 ||
+        hero.name.toLowerCase().localeCompare(this.newName.toLowerCase()) === 1
+      ) {
+        this.heroToModify.name = this.newName;
+        this.isEdit = false;
+      }
+
+      for (let i = 0; i < this.chosenHeroesSelected.length; i++) {
+        console.log("changed in update", this.chosenHeroesSelected[i]);
+        if (hero.id === this.chosenHeroesSelected[i].id) {
+          this.chosenHeroesSelected[i].name = this.newName;
+        }
+      }
     },
 
-    heroUpdated(name) {
-      console.log(name);
-      this.chosenHeroesSelected.push(name);
-      // this.heroes = this.heroes.filter(h => h.name != name)
+    heroUpdated(data) {
+      this.chosenHeroesSelected.push(data);
+      for (let i = 0; i < this.chosenHeroesSelected.length; i++) {
+        console.log("changed in update", this.chosenHeroesSelected[i]);
+      }
     },
     heroRemovedFromSelected(hero) {
-      console.log(hero.name);
+      // console.log(hero, 'removed hero');
       this.chosenHeroesSelected = this.chosenHeroesSelected.filter(
-        (h) => h != hero.name
+        (h) => h.id !== hero.id
       );
     },
 

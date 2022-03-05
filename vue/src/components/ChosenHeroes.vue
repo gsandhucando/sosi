@@ -1,16 +1,19 @@
 <template>
   <div>
     <div class="selectionContainer">
-      <select v-model="chosenHero" :disabled="chosenHeroes.length === 3">
+      <select
+        v-model="chosenHero"
+        :disabled="chosenHeroesSelected.length === 3"
+      >
         <!-- placeholder value -->
         <option :value="null">Select a hero</option>
 
         <!-- available heroes -->
         <option
           v-for="hero in heroes"
-          :key="hero.name"
-          :value="hero.name"
-          :disabled="chosenHeroesSelected.includes(hero.name)"
+          :key="hero.id"
+          :value="{ id: hero.id, name: hero.name }"
+          :disabled="chosenHeroesSelected.find((h) => hero.name === h.name)"
         >
           {{ hero.name }}
         </option>
@@ -19,14 +22,14 @@
       <div class="btnContainer">
         <button
           @click="addHero(chosenHero)"
-          :disabled="chosenHeroes.length === 3"
+          :disabled="chosenHeroesSelected.length === 3"
         >
           Add Hero
         </button>
         <button
           @click="launch"
           class="launchBtn"
-          v-if="chosenHeroes.length === 3"
+          v-if="chosenHeroesSelected.length === 3"
         >
           Launch Mission
         </button>
@@ -35,7 +38,7 @@
     <br />
     <h3>Chosen Heroes</h3>
     <div class="chosen-heroes">
-      <div v-for="(hero, i) in chosenHeroes" :key="hero.name">
+      <div v-for="(hero, i) in chosenHeroesSelected" :key="hero.id">
         <strong>Slot {{ i + 1 }}:</strong>
         <Hero :hero="hero" @removeHero="removeHero(hero)" />
       </div>
@@ -50,25 +53,20 @@ export default {
   components: {
     Hero,
   },
-  props: ["heroes", "chosenHeroesSelected", "heroesCopy"],
+  props: ["heroes", "chosenHeroesSelected"],
   data() {
     return {
       chosenHero: null,
-      chosenHeroes: [],
       launchedMission: false,
     };
   },
   methods: {
-    addHero(name) {
-      console.log(name, "addHero");
-      this.$emit("update:heroAdded", name);
-
-      this.chosenHeroes.push({ name });
-      this.chosenHero = null;
+    addHero(data) {
+      this.$emit("update:heroAdded", { id: data.id, name: data.name });
+      this.chosenHero = null
     },
 
     removeHero(hero) {
-      this.chosenHeroes = this.chosenHeroes.filter((h) => h.name != hero.name);
       this.$emit("update:heroRemoved", hero);
     },
     launch() {
