@@ -18,7 +18,6 @@
         <span class="edit" @click="editHero(hero)">edit</span>
       </li>
       <br />
-      <!-- <div v-for="hero in heroes" :key="hero.name"> -->
       <input
         type="text"
         placeholder="new name"
@@ -27,7 +26,6 @@
         @keyup.enter="changeName(heroToModify)"
         @blur="clear"
       />
-      <!-- </div> -->
       <br />
       <span v-if="isEdit"
         >enter to submit, click outside the box to cancel</span
@@ -111,9 +109,6 @@ export default {
 
     heroUpdated(data) {
       this.chosenHeroesSelected.push(data);
-      for (let i = 0; i < this.chosenHeroesSelected.length; i++) {
-        console.log("changed in update", this.chosenHeroesSelected[i]);
-      }
     },
     heroRemovedFromSelected(hero) {
       // console.log(hero, 'removed hero');

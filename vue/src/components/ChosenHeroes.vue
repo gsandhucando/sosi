@@ -63,7 +63,7 @@ export default {
   methods: {
     addHero(data) {
       this.$emit("update:heroAdded", { id: data.id, name: data.name });
-      this.chosenHero = null
+      this.chosenHero = null;
     },
 
     removeHero(hero) {
